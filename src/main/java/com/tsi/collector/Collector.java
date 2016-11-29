@@ -2,62 +2,30 @@ package com.tsi.collector;
 
 import com.tsi.entity.Comment;
 import com.tsi.entity.Document;
+import com.tsi.entity.DocumentBuilder;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Path("/rest")
 public class Collector
 {
-    private static List<Document> documents;
+    static List<Document> documentList;
 
-    static{
-        documents = populateDocuments();
+    static {
+        documentList = populateDocuments();
     }
 
     @Path("getAllDocuments")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public List<Document> getAllDocuments()
     {
-        List<Document> documents = new ArrayList<>();
-        Document doc = new Document();
-        doc.setId(1);
-        doc.setName("doc1");
-        doc.setTitle("title");
-        doc.setContent("content");
-        Map<String, String> indexMap = new HashMap<String, String>()
-        {{
-            put("a","b");
-        }};
-        doc.setIndexMap(indexMap);
-        Comment comment = new Comment();
-        comment.setId(3);
-        comment.setUserId(2);
-        comment.setContent("comment content");
-        doc.setComments(Collections.singletonList(comment));
-
-        Document doc1 = new Document();
-        doc1.setId(1);
-        doc1.setName("doc1");
-        doc1.setTitle("title");
-        doc1.setContent("content");
-        Map<String, String> indexMap1 = new HashMap<String, String>()
-        {{
-            put("a","b");
-        }};
-        doc1.setIndexMap(indexMap1);
-        Comment comment1 = new Comment();
-        comment1.setId(3);
-        comment1.setUserId(2);
-        comment1.setContent("comment content");
-        doc1.setComments(Collections.singletonList(comment1));
-
-        documents.add(doc);
-        documents.add(doc1);
-        return documents;
+        return documentList;
     }
 
     @Path("add")
@@ -66,39 +34,109 @@ public class Collector
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addDocument(Document document)
     {
-        return Response.status(201).entity(new Document()).build();
+        documentList.add(document);
+        System.out.println("Created document with id " + document.getId());
+
+        return Response.status(201).entity(document).build();
     }
 
     @Path("get/{id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Document getDocumentById(@PathParam("id") String id)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getDocumentById(@PathParam("id") String id)
     {
-        return new Document();
+       System.out.println("Fetching document with id " + id);
+
+       Document response = documentList.stream()
+                .filter(document -> id.equals(document.getId().toString()))
+                .findAny()
+                .orElse(null);
+
+       if (response != null) {
+            System.out.println("Found document with id " + response.getId());
+       }
+
+        return Response.status(200).entity(response).build();
     }
 
-    @Path("update/{id}")
+    @Path("update")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateDocument(@PathParam("id") String id)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateDocument(Document documentToUpdate)
     {
-        return Response.status(200).entity(new Document()).build();
+        System.out.println("Updating document with id " + documentToUpdate.getId());
+
+        documentList = documentList.stream()
+                .filter(document -> !document.getId().equals(documentToUpdate.getId()))
+                .collect(Collectors.toList());
+
+        documentList.add(documentToUpdate);
+
+        System.out.println("Updated document with id " + documentToUpdate.getId());
+
+        return Response.status(200).entity(documentToUpdate).build();
     }
 
     @Path("delete/{id}")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteDocument(@PathParam("id") String id)
     {
-        return Response.status(200).entity(new Document()).build();
+        System.out.println("Removing document with id " + id);
+
+        documentList = documentList.stream()
+                .filter(document -> !id.equals(document.getId().toString()))
+                .collect(Collectors.toList());
+
+        System.out.println("Removed document with id " + id);
+
+        return Response.status(204).build();
     }
 
     private static List<Document> populateDocuments(){
-        List<Document> document = new ArrayList<Document>();
-        //users.add(new User(counter.incrementAndGet(),"Sam",30, 70000));
-        //users.add(new User(counter.incrementAndGet(),"Tom",40, 50000));
-        //users.add(new User(counter.incrementAndGet(),"Jerome",45, 30000));
-        //users.add(new User(counter.incrementAndGet(),"Silvia",50, 40000));
-        return documents;
+        List<Document> documentList = new ArrayList<Document>();
+
+        Document documentFirst = new DocumentBuilder()
+                .setId(UUID.fromString("664a8fa0-312c-48ee-9863-dcb88ca0c50a"))
+                .setName("First name doc")
+                .setContent("First content doc")
+                .setTitle("First title doc")
+                .setIndexMap("index one", "index two")
+                .setComments("First coment doc")
+                .build();
+
+        System.out.println("Created document with id " + documentFirst.getId());
+
+        Document documentSecond = new DocumentBuilder()
+                .setId(UUID.fromString("d88c925f-a8ec-45f0-836b-0a3e6bb621d0"))
+                .setName("Second name doc")
+                .setContent("Second content doc")
+                .setTitle("Second title doc")
+                .setIndexMap("index one", "index two")
+                .setComments("Second coment doc")
+                .build();
+
+        System.out.println("Created document with id " + documentSecond.getId());
+
+        Document documentThird = new DocumentBuilder()
+                .setId(UUID.fromString("1cb38092-37dd-4475-80f0-8772a988a6ce"))
+                .setName("Third name doc")
+                .setContent("Third content doc")
+                .setTitle("Third title doc")
+                .setIndexMap("index one", "index two")
+                .setComments("Third coment doc")
+                .build();
+
+        System.out.println("Created document with id " + documentThird.getId());
+
+        documentList.add(documentFirst);
+        documentList.add(documentSecond);
+        documentList.add(documentThird);
+
+        return documentList;
     }
+
 }

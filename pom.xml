@@ -47,6 +47,11 @@
       <artifactId>jersey-media-json-jackson</artifactId>
       <version>${jersey2.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.tsi</groupId>
+      <artifactId>document-dto</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
@@ -63,19 +68,19 @@
       </plugin>
 
       <plugin>
-        <groupId>org.mortbay.jetty</groupId>
+        <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
-        <version>8.1.16.v20140903</version>
+        <version>9.4.0.M0</version>
         <configuration>
           <webApp>
             <contextPath>/</contextPath>
           </webApp>
-          <connectors>
-            <!-- or org.eclipse.jetty.server.bio.SocketConnector to avoid file locking on windows -->
+          <!-- <connectors>
+            or org.eclipse.jetty.server.bio.SocketConnector to avoid file locking on windows
             <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
               <port>8091</port>
             </connector>
-          </connectors>
+          </connectors>-->
         </configuration>
       </plugin>
     </plugins>
