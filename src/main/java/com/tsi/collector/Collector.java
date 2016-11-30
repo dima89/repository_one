@@ -5,12 +5,14 @@ import com.tsi.entity.Document;
 import com.tsi.entity.DocumentBuilder;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Path("/rest")
+@Path("/")
 public class Collector
 {
     static List<Document> documentList;
@@ -44,7 +46,7 @@ public class Collector
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getDocumentById(@PathParam("id") String id)
+    public Response getDocumentById(@PathParam("id") String id, @Context UriInfo uriInfo)
     {
        System.out.println("Fetching document with id " + id);
 
@@ -57,7 +59,7 @@ public class Collector
             System.out.println("Found document with id " + response.getId());
        }
 
-        return Response.status(200).entity(response).build();
+        return Response.status(200).entity(response).location(uriInfo.getBaseUri()).build();
     }
 
     @Path("update")
@@ -105,7 +107,9 @@ public class Collector
                 .setContent("First content doc")
                 .setTitle("First title doc")
                 .setIndexMap("index one", "index two")
+                .setIndexMap("index two", "index three")
                 .setComments("First coment doc")
+                .setComments("Second commend doc")
                 .build();
 
         System.out.println("Created document with id " + documentFirst.getId());

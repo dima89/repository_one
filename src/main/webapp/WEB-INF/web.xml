@@ -21,6 +21,6 @@
 
   <servlet-mapping>
     <servlet-name>jersey-servlet</servlet-name>
-    <url-pattern>/repo1/*</url-pattern>
+    <url-pattern>/repo1/rest/*</url-pattern>
   </servlet-mapping>
 </web-app>
