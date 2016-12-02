@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Path("/")
-public class Collector
+public class ServiceFacadeImpl implements ServiceFacade
 {
     static List<Document> documentList;
 
@@ -36,6 +36,13 @@ public class Collector
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addDocument(Document document)
     {
+        document.setId(UUID.randomUUID());
+
+        for (Comment comment: document.getComments()) {
+            comment.setId(UUID.randomUUID());
+            comment.setUserId(UUID.randomUUID());
+        }
+
         documentList.add(document);
         System.out.println("Created document with id " + document.getId());
 
@@ -74,6 +81,13 @@ public class Collector
                 .filter(document -> !document.getId().equals(documentToUpdate.getId()))
                 .collect(Collectors.toList());
 
+        for (Comment comment: documentToUpdate.getComments()) {
+            if (comment.getId() == null) {
+                comment.setId(UUID.randomUUID());
+                comment.setUserId(UUID.randomUUID());
+            }
+        }
+
         documentList.add(documentToUpdate);
 
         System.out.println("Updated document with id " + documentToUpdate.getId());
@@ -85,7 +99,7 @@ public class Collector
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteDocument(@PathParam("id") String id)
+    public Response deleteDocument(@PathParam("id") String id, @Context UriInfo uriInfo)
     {
         System.out.println("Removing document with id " + id);
 
@@ -95,7 +109,7 @@ public class Collector
 
         System.out.println("Removed document with id " + id);
 
-        return Response.status(204).build();
+        return Response.status(204).location(uriInfo.getBaseUri()).build();
     }
 
     private static List<Document> populateDocuments(){
@@ -108,8 +122,8 @@ public class Collector
                 .setTitle("First title doc")
                 .setIndexMap("index one", "index two")
                 .setIndexMap("index two", "index three")
-                .setComments("First coment doc")
-                .setComments("Second commend doc")
+                .addComment(new Comment(UUID.fromString("f9bc64b5-03c9-415b-976b-9dd597d585e6"), UUID.fromString("32895c35-f496-4cb1-a505-7ccb4fbd1be1"), "First comment doc"))
+                .addComment(new Comment(UUID.randomUUID(), UUID.randomUUID(), "Second comment doc"))
                 .build();
 
         System.out.println("Created document with id " + documentFirst.getId());
@@ -120,7 +134,7 @@ public class Collector
                 .setContent("Second content doc")
                 .setTitle("Second title doc")
                 .setIndexMap("index one", "index two")
-                .setComments("Second coment doc")
+                .addComment(new Comment(UUID.fromString("ed60422f-9be9-4230-af61-95080c1871f5"), UUID.fromString("59d02fff-0c02-4ad1-8958-c0b22e6b2478"), "Second comment doc"))
                 .build();
 
         System.out.println("Created document with id " + documentSecond.getId());
@@ -131,7 +145,7 @@ public class Collector
                 .setContent("Third content doc")
                 .setTitle("Third title doc")
                 .setIndexMap("index one", "index two")
-                .setComments("Third coment doc")
+                .addComment(new Comment(UUID.fromString("7fcadc44-ad7b-4207-8d3a-973e09190b22"), UUID.fromString("0cd81f37-dbf2-49d5-8438-964304914b5e"), "Third comment doc"))
                 .build();
 
         System.out.println("Created document with id " + documentThird.getId());
