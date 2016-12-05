@@ -123,7 +123,7 @@ public class ServiceFacadeImpl implements ServiceFacade
                 .setIndexMap("index one", "index two")
                 .setIndexMap("index two", "index three")
                 .addComment(new Comment(UUID.fromString("f9bc64b5-03c9-415b-976b-9dd597d585e6"), UUID.fromString("32895c35-f496-4cb1-a505-7ccb4fbd1be1"), "First comment doc"))
-                .addComment(new Comment(UUID.randomUUID(), UUID.randomUUID(), "Second comment doc"))
+                .addComment(new Comment(UUID.fromString("f9bc64b5-03c9-415b-976b-9dd597d585e7"), UUID.fromString("32895c35-f496-4cb1-a505-7ccb4fbd1be2"), "Second comment doc"))
                 .build();
 
         System.out.println("Created document with id " + documentFirst.getId());
